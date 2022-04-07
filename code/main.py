@@ -1,15 +1,19 @@
-from pnn import *
-from sklearn.model_selection import StratifiedKFold as KF
-from sklearn.metrics import log_loss
-from sklearn.preprocessing import LabelBinarizer
-from math import log
 import numpy as np
 import pandas as pd
+
+from sklearn.model_selection import StratifiedKFold as KF
+from sklearn import metrics
+from sklearn.metrics import log_loss
+from sklearn.preprocessing import LabelBinarizer
+
 import math
+from math import log
+
 import copy
 import datetime
-from sklearn import metrics
+
 from SSA import SSA
+from pnn import *
 
 labels = [1,2,3]
 
@@ -30,12 +34,7 @@ def pnn_ssa(Filename,acclevel):
     def problemm(x):
     
         x=pd.DataFrame(x)
-        alist=[]
-        costlist=[]
-        mset=[]
-        msev=[]
-        fclist=[]
-        list=[]
+        alist,costlist,mset,msev,fclist,list=[],[],[],[],[],[]
         
         for l in range(pop_size):     
             c = pd.read_csv(Filename,header=None)
@@ -50,7 +49,7 @@ def pnn_ssa(Filename,acclevel):
             
             ##训练模型      
             def runpnn():
-                trainX, labelX = load_data("name.txt")
+                trainX, labelX = load_data(Filename)
                 Nor_trainX = Normalization(trainX[0:trainset,:])
                 Nor_testX = Normalization(trainX[0:trainset,:]) ###trainss
                 Euclidean_D = distance_mat(Nor_trainX,Nor_testX)
@@ -94,7 +93,7 @@ def pnn_ssa(Filename,acclevel):
                     squaredErrorv.append(valv * valv)#target-prediction之差平方 
                     
                 MSEv=sum(squaredErrorv)/len(squaredErrorv)
-                #print (Pbb, Prob)
+
                 where_are_null = np.isnan(Prob)
                 Prob[where_are_null] = 0.1
                 
@@ -115,7 +114,7 @@ def pnn_ssa(Filename,acclevel):
                 X_train=pd.DataFrame(X_train)                
                 X_test=pd.DataFrame(X_test)                
                 ccc=pd.concat([X_train,X_test],axis=0)                
-                #np.savetxt('name.txt',ccc,fmt='%d', delimiter='\t')
+
                 worngn,m,finsc,finscb,MSE,MSEv,sk_log_lossv=runpnn()
 
                 worngn=worngn**3
@@ -147,12 +146,10 @@ def pnn_ssa(Filename,acclevel):
     c.iloc[:,2] = c.iloc[:,2]*cr1.iat[l,2]
     c.iloc[:,3] = c.iloc[:,3]*cr1.iat[l,3]
     cci=pd.concat([a0s,a1xs,b1xs,c1xs,a6s],axis=1)        
-    #保存加权后的文件
-    np.savetxt('nameu.txt',c,fmt='%d', delimiter='\t')
 
     def runpnnr():
     # 1、导入数据
-        trainX, labelX = load_data("nameu.txt")   ##########nameuc
+        trainX, labelX = load_data(cci)   ##########nameuc
     
     # 2、样本数据归一化 
         #模型的训练集
