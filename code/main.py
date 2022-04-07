@@ -38,13 +38,12 @@ def pnn_ssa(Filename,acclevel):
         list=[]
         
         for l in range(pop_size):     
-
             c = pd.read_csv(Filename,header=None)
             c.iloc[:,0] = c.iloc[:,0]*x.iat[l,0]
             c.iloc[:,1] = c.iloc[:,1]*x.iat[l,1]
             c.iloc[:,2] = c.iloc[:,2]*x.iat[l,2]
             c.iloc[:,3] = c.iloc[:,3]*x.iat[l,3]
-            
+    
             XX=c.iloc[:,0:-1].values
             yy=c.iloc[:,-1].values
             kf=KF(n_splits=5,shuffle=True)
@@ -77,8 +76,7 @@ def pnn_ssa(Filename,acclevel):
                     if scoreb[i] == 0:
                         asss=asss+1
                 finsc=(trainset-asss)/trainset
-                
-                
+               
                 #验证集准确率
                 Nor_testX = Normalization(trainX[trainset:trainss,:]) 
 
@@ -86,14 +84,8 @@ def pnn_ssa(Filename,acclevel):
                 Gauss_mat = Gauss(Euclidean_D,m)
                 Prob,label_class = Prob_mat(Gauss_mat,labelX)
                 predict_results = calss_results(Prob,label_class)
-                Pab=predict_results
-                Pbb=labelX[trainset:trainss] #jieguo
-                pab=pd.DataFrame(Pab)
-                pbb=pd.DataFrame(Pbb)
-                #print (Pab,Pbb)
-                scoreeeb=pab-pbb
-                scoreeeb=scoreeeb.T
-                scoreeeb=scoreeeb.values.tolist()
+                scoreeeb=(pd.DataFrame(predict_results)-pd.DataFrame(labelX[trainset:trainss])).T.values.tolist()
+
                 scorebb = [ i for item in scoreeeb for i in item]
                 asssb=0
                 
@@ -145,43 +137,10 @@ def pnn_ssa(Filename,acclevel):
         return sla
     #开始疯狂循环
     cr1=SSA(problemm).run(True)
-
-#SSA(problemm).run(True)
-
-# -*- coding: utf-8 -*-
-
-#处理加权后的文件
-    c1=cr1.iat[0,0]
-    c2=cr1.iat[1,0]
-    c3=cr1.iat[2,0]
-    #c4=cr1.iat[3,0]
-    #c1=1
-    #c2=1
-    #c3=1
-    #c4=1
-    m0=cr1.iat[3,0]
+    
+    m0=cr1.iat[4,0]
     m=(np.abs(m0)+0.1)/bound
-    #print (c1,c2,c3,c4,m)
-    a0s=pd.read_csv(Filename,header=None, usecols=[0])
-        
-    a1xs=pd.read_csv(Filename,header=None, usecols=[1])
-    a1xs=a1xs.values
-    a1xs=a1xs*c1
-    b1xs=pd.read_csv(Filename,header=None, usecols=[2])
-    b1xs=b1xs.values
-    b1xs=b1xs*c2
-    c1xs=pd.read_csv(Filename,header=None, usecols=[3])
-    c1xs=c1xs.values
-    c1xs=c1xs*c3
-    #d1xs=pd.read_csv(Filename,header=None, usecols=[4])
-    #d1xs=d1xs.values
-    #d1xs=d1xs*c4
-    a6s=pd.read_csv(Filename,header=None, usecols=[5])
-        
-    a1xs=pd.DataFrame(a1xs)
-    b1xs=pd.DataFrame(b1xs)
-    c1xs=pd.DataFrame(c1xs)
-    #d1xs=pd.DataFrame(d1xs)
+    
     c = pd.read_csv(Filename,header=None)
     c.iloc[:,0] = c.iloc[:,0]*cr1.iat[l,0]
     c.iloc[:,1] = c.iloc[:,1]*cr1.iat[l,1]
@@ -205,17 +164,9 @@ def pnn_ssa(Filename,acclevel):
         Euclidean_D = distance_mat(Nor_trainX,Nor_testX)
         Gauss_mat = Gauss(Euclidean_D,m)
         Prob,label_class = Prob_mat(Gauss_mat,labelX)
-    
         predict_results = calss_results(Prob,label_class)
 
-        Pa=predict_results
-        Pb=labelX[0:trainss]
-        
-        pa=pd.DataFrame(Pa)
-        pb=pd.DataFrame(Pb)
-        scoreee=pa-pb
-        scoreee=scoreee.T
-        scoreee=scoreee.values.tolist()
+        scoreee=(pd.DataFrame(predict_results)-pd.DataFrame(labelX[0:trainss])).T.values.tolist()
         score = [ i for item in scoreee for i in item] #去中括号
         asss=0
         for i in range(len(score)):
@@ -246,6 +197,6 @@ def pnn_ssa(Filename,acclevel):
         accu=metrics.accuracy_score(Predict_r,True_r)
 
         return (Predict_r,Prob,True_r,finsc,accu,prec,recall1,recall2,mf1)
-    Predict_r,Prob,True_r,finsc,accu,prec,recall1,recall2,mf1=runpnnr()
-    return (Predict_r,Prob,True_r,finsc,accu,prec,recall1,recall2,mf1)
+
+    return runpnnr()
     ####################ok
